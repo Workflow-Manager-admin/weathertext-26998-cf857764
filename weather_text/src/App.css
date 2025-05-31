@@ -73,18 +73,7 @@ body {
   font-weight: 500;
 }
 
-.weather-city {
-  font-size: 1.37rem;
-  font-weight: 600;
-  color: var(--primary);
-  background: none;
-  border-radius: 12px 12px 0 0;
-  letter-spacing: 0.01em;
-  text-align: center;
-  margin-bottom: 10px;
-  padding-bottom: 0.1em;
-  line-height: 1.4;
-}
+/* .weather-city removed – no longer needed */
 
 .weather-temp-row {
   margin: 10px 0 6px 0;
