@@ -10,40 +10,21 @@ function App() {
     error: null,
   });
 
-  // Helper to fetch weather from Open-Meteo
-  const fetchWeather = async (lat, lon) => {
+  // Helper to fetch weather from Open-Meteo for a static location (e.g., New York)
+  // All geolocation and location/city usage are removed.
+  const fetchWeather = async () => {
     try {
-      // Open-Meteo API for current weather with reverse geocoding for city name
-      // See: https://open-meteo.com/en/docs for free endpoints with no API key requirement
+      // Use static coordinates (example: New York)
+      const lat = 40.7128;
+      const lon = -74.0060;
       const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
-      // For reverse geocoding (city name)
-      const geoUrl = `https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}&language=en`;
 
-      const [weatherRes, geoRes] = await Promise.all([
-        fetch(weatherUrl),
-        fetch(geoUrl),
-      ]);
-      if (!weatherRes.ok || !geoRes.ok) throw new Error("Unable to fetch data");
+      const weatherRes = await fetch(weatherUrl);
+
+      if (!weatherRes.ok) throw new Error("Unable to fetch data");
 
       const weatherData = await weatherRes.json();
-      const geoData = await geoRes.json();
 
-      let city = "Unknown location";
-      if (
-        geoData &&
-        geoData.results &&
-        geoData.results.length &&
-        geoData.results[0].city
-      ) {
-        city = geoData.results[0].city;
-      } else if (
-        geoData &&
-        geoData.results &&
-        geoData.results.length &&
-        geoData.results[0].name
-      ) {
-        city = geoData.results[0].name;
-      }
       // Weather description mapping for Open-Meteo codes
       const weatherDescMap = {
         0: 'Clear sky',
@@ -80,7 +61,6 @@ function App() {
         (weatherData.current_weather || {});
 
       setWeather({
-        city,
         temperature,
         description: weatherDescMap[weathercode] || 'Unknown',
       });
@@ -90,26 +70,9 @@ function App() {
     }
   };
 
-  // On mount, get geolocation & weather data
+  // On mount, just fetch weather statically (no geolocation, no area/city)
   useEffect(() => {
-    if (!navigator.geolocation) {
-      setCardState({
-        loading: false,
-        error: "Geolocation is not supported by your browser.",
-      });
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        fetchWeather(position.coords.latitude, position.coords.longitude);
-      },
-      () => {
-        setCardState({
-          loading: false,
-          error: "Unable to retrieve your location.",
-        });
-      }
-    );
+    fetchWeather();
     // eslint-disable-next-line
   }, []);
 
@@ -127,7 +90,6 @@ function App() {
           )}
           {!cardState.loading && !cardState.error && weather && (
             <div className="weather-content">
-              <header className="weather-city">{weather.city}</header>
               <div className="weather-temp-row">
                 <span className="weather-temp">{Math.round(weather.temperature)}°C</span>
               </div>
