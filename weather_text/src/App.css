@@ -11,6 +11,7 @@
   --weather-card-width: 360px;
   --weather-footer: #d3e1fa;
 }
+/* No images or background-image properties used anywhere in this stylesheet */
 
 body {
   margin: 0;
